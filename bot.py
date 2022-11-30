@@ -7,94 +7,80 @@ from utils import Converter, ConvertExeption
 
 bot = telebot.TeleBot(TOKEN)
 
-count = 0
-quote = ''
-base = ''
 
-
-def buttons():
-    markup = types.InlineKeyboardMarkup(row_width=1)
-    item1 = types.InlineKeyboardButton("USD", callback_data='USD')
-    item2 = types.InlineKeyboardButton("EUR", callback_data='EUR')
-    item3 = types.InlineKeyboardButton("RUR", callback_data='RUB')
-    return markup.add(item1, item2, item3)
+quote = ""
+base = ""
 
 
 @bot.message_handler(commands=['start', 'help'])
 def handle_start_help(message):
     msg = "Выбери название валюты, которую хочешь узнать:"
 
-    markup = buttons()
+    markup = types.InlineKeyboardMarkup(row_width=1)
+    item1 = types.InlineKeyboardButton("USD", callback_data='USD')
+    item2 = types.InlineKeyboardButton("EUR", callback_data='EUR')
+    item3 = types.InlineKeyboardButton("RUB", callback_data='RUB')
+    markup.add(item1, item2, item3)
+
     bot.send_message(message.chat.id, f"Привет , {message.chat.username}!\n{msg}", reply_markup=markup)
 
 
 @bot.callback_query_handler(func=lambda call: True)
 def callback(call):
-    global count
-    # global quote
-    # global base
+    global base
+    global quote
 
-    if count == 0:
-        # if call.data == 'USD':
-        #     quote = 'доллар'
-        # if call.data == 'EUR':
-        #     quote = 'евро'
-        # if call.data == 'RUR':
-        #     quote = 'рубль'
-        # quote = 'доллар'
-        markup1 = buttons()
-        bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                              text="Введите валюту в которой необходимо узнать:",
-                              reply_markup=markup1)
+    if call.data == 'USD':
+        quote = 'доллар'
+        markup1 = types.InlineKeyboardMarkup(row_width=1)
+        item1 = types.InlineKeyboardButton("USD", callback_data='USD1')
+        item2 = types.InlineKeyboardButton("EUR", callback_data='EUR1')
+        item3 = types.InlineKeyboardButton("RUB", callback_data='RUB1')
+        markup1.add(item1, item2, item3)
 
+        bot.send_message(call.message.chat.id, 'введи валюту', reply_markup=markup1)
+    if call.data == 'EUR':
+        quote = 'евро'
+        markup1 = types.InlineKeyboardMarkup(row_width=1)
+        item1 = types.InlineKeyboardButton("USD", callback_data='USD1')
+        item2 = types.InlineKeyboardButton("EUR", callback_data='EUR1')
+        item3 = types.InlineKeyboardButton("RUB", callback_data='RUB1')
+        markup1.add(item1, item2, item3)
 
-    if count == 1:
-        count -= 1
+        bot.send_message(call.message.chat.id, 'введи валюту', reply_markup=markup1)
+    if call.data == 'RUB':
+        quote = 'рубль'
+        markup1 = types.InlineKeyboardMarkup(row_width=1)
+        item1 = types.InlineKeyboardButton("USD", callback_data='USD1')
+        item2 = types.InlineKeyboardButton("EUR", callback_data='EUR1')
+        item3 = types.InlineKeyboardButton("RUB", callback_data='RUB1')
+        markup1.add(item1, item2, item3)
 
-        # if call.data == 'USD':
-        #     base = 'доллар'
-        # if call.data == 'EUR':
-        #     base = 'евро'
-        # if call.data == 'RUR':
-        #     base = 'рубль'
+        bot.send_message(call.message.chat.id, 'введи валюту', reply_markup=markup1)
 
-        # base = 'евро'
+    if call.data == 'USD1':
+        base = 'доллар'
 
-        bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                              text="Введите количество валюты:")
+        bot.send_message(call.message.chat.id, 'введи количество')
+    if call.data == 'EUR1':
+        base = 'евро'
 
-
-@bot.message_handler(commands=['values'])
-def handle_values(message):
-    text = "Доступные валюты:"
-    for key in keys.keys():
-        text = "\n".join((text, key,))
-    bot.send_message(message.chat.id, text)
+        bot.send_message(call.message.chat.id, 'введи количество')
+    if call.data == 'RUB1':
+        base = 'рубль'
+        bot.send_message(call.message.chat.id, 'введи количество')
 
 
 @bot.message_handler(content_types=['text', ])
 def conv(message):
-    #     try:
-    #         values = message.text.split(' ')
-    #
-    #         if len(values) != 3:
-    #             raise ConvertExeption("Слишком много параметров.")
-    #
-    #         quote, base, amount = values
-    #
-    #         total_base = Converter.converter(quote, base, amount)
-    #     except ConvertExeption as e:
-    #         bot.send_message(message.chat.id, f"Ошибка пользователя\n {e}")
-    #     except Exception as e:
-    #         bot.send_message(message.chat.id, f"Не удалось обработать команду\n {e}")
-    #     else:
-    #         text = f"цена {amount} {quote} в {base} - {total_base}"
-    #         bot.send_message(message.chat.id, text)
+    global base
+    global quote
 
-    amount = int(message.text)
-    total_base = Converter.converter(str(quote), str(base), str(amount))
+    amount = message.text
+    total_base = Converter.converter(quote, base, amount)
     text = f"цена {amount} {quote} в {base} - {total_base}"
     bot.send_message(message.chat.id, text)
 
 
-bot.polling(none_stop=True)
+if __name__ == '__main__':
+    bot.polling(none_stop=True)
