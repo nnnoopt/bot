@@ -9,15 +9,16 @@ bot = telebot.TeleBot(TOKEN)
 
 @bot.message_handler(commands=['start', 'help'])
 def handle_start_help(message):
-    msg = "Введи название валюты, которую хочешь узнать,\n" \
-          "имя валюты, в которой надо узнать цену первой валюты. количество первой валюты\n" \
-          "список валют: /values"
+    msg = "Введи название валюты, которую хочешь узнать:\n" \
+          "Bмя валюты, в которой надо узнать цену первой валюты.\n" \
+          "Количество первой валюты.\n" \
+          "Список валют: /values"
 
     bot.send_message(message.chat.id, f"Привет , {message.chat.username}!\n{msg}")
 
 
 @bot.message_handler(commands=['values'])
-def handle_start_help(message):
+def handle_values (message):
     text = "Доступные валюты:"
     for key in keys.keys():
         text = "\n".join((text, key,))
