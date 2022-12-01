@@ -15,7 +15,7 @@ class Line_of_buttons:
         self.number_line_of_buttons = number_line_of_buttons
         self.keys = keys
         self.markup = types.InlineKeyboardMarkup(row_width=1)
-
+    @property
     def get_markup(self):
         for i in range(len(self.keys)):
             self.item = types.InlineKeyboardButton(self.keys[i],
@@ -29,25 +29,14 @@ class Converter:
     @staticmethod
     def converter(quote: str, base: str, amount: str):
 
-        if quote == base:
-            raise ConvertExeption(f"Нельзя перевести одинаковые валюты {base}")
-
-        try:
-            quote_ticker = keys[quote]
-        except KeyError:
-            raise ConvertExeption(f"Не удалось обработать валюту {quote}")
-
-        try:
-            base_ticker = keys[base]
-        except KeyError:
-            raise ConvertExeption(f"Не удалось обработать валюту {base}")
 
         try:
             amount = float(amount)
         except ValueError:
             raise ConvertExeption(f"Не удалось обработать {amount}")
 
-        r = requests.get(f'https://min-api.cryptocompare.com/data/price?fsym={quote_ticker}&tsyms={base_ticker}')
-        total_base = json.loads(r.content)[keys[base]] * amount
+
+        r = requests.get(f'https://min-api.cryptocompare.com/data/price?fsym={quote}&tsyms={base}')
+        total_base = json.loads(r.content)[base] * amount
 
         return total_base

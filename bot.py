@@ -1,12 +1,10 @@
 import telebot
-from telebot import types
 
 from config import keys, TOKEN
 
 from utils import Converter, ConvertExeption, Line_of_buttons
 
 bot = telebot.TeleBot(TOKEN)
-
 
 quote = ""
 base = ""
@@ -18,64 +16,54 @@ def handle_start_help(message):
 
     buttons1 = Line_of_buttons(keys, number_line_of_buttons=1)
 
-    bot.send_message(message.chat.id, f"Привет , {message.chat.username}!\n{msg}", reply_markup=buttons1.get_markup())
+    bot.send_message(message.chat.id, f"Привет , {message.chat.username}!\n{msg}", reply_markup=buttons1.get_markup)
 
 
 @bot.callback_query_handler(func=lambda call: True)
 def callback(call):
     global base
     global quote
-
-    if call.data == 'USD':
-        quote = 'доллар'
-        markup1 = types.InlineKeyboardMarkup(row_width=1)
-        item1 = types.InlineKeyboardButton("USD", callback_data='USD1')
-        item2 = types.InlineKeyboardButton("EUR", callback_data='EUR1')
-        item3 = types.InlineKeyboardButton("RUB", callback_data='RUB1')
-        markup1.add(item1, item2, item3)
-
-        bot.send_message(call.message.chat.id, 'введи валюту', reply_markup=markup1)
-    if call.data == 'EUR':
-        quote = 'евро'
-        markup1 = types.InlineKeyboardMarkup(row_width=1)
-        item1 = types.InlineKeyboardButton("USD", callback_data='USD1')
-        item2 = types.InlineKeyboardButton("EUR", callback_data='EUR1')
-        item3 = types.InlineKeyboardButton("RUB", callback_data='RUB1')
-        markup1.add(item1, item2, item3)
-
-        bot.send_message(call.message.chat.id, 'введи валюту', reply_markup=markup1)
-    if call.data == 'RUB':
-        quote = 'рубль'
-        markup1 = types.InlineKeyboardMarkup(row_width=1)
-        item1 = types.InlineKeyboardButton("USD", callback_data='USD1')
-        item2 = types.InlineKeyboardButton("EUR", callback_data='EUR1')
-        item3 = types.InlineKeyboardButton("RUB", callback_data='RUB1')
-        markup1.add(item1, item2, item3)
-
-        bot.send_message(call.message.chat.id, 'введи валюту', reply_markup=markup1)
+    buttons2 = Line_of_buttons(keys, number_line_of_buttons=2)
 
     if call.data == 'USD1':
-        base = 'доллар'
+        quote = 'USD'
 
-        bot.send_message(call.message.chat.id, 'введи количество')
+        bot.send_message(call.message.chat.id, 'введи валюту', reply_markup=buttons2.get_markup)
     if call.data == 'EUR1':
-        base = 'евро'
+        quote = 'EUR'
 
-        bot.send_message(call.message.chat.id, 'введи количество')
+        bot.send_message(call.message.chat.id, 'введи валюту', reply_markup=buttons2.get_markup)
     if call.data == 'RUB1':
-        base = 'рубль'
+        quote = 'RUB'
+
+        bot.send_message(call.message.chat.id, 'введи валюту', reply_markup=buttons2.get_markup)
+
+    if call.data == 'USD2':
+        base = 'USD'
+
+        bot.send_message(call.message.chat.id, 'введи количество')
+    if call.data == 'EUR2':
+        base = 'EUR'
+
+        bot.send_message(call.message.chat.id, 'введи количество')
+    if call.data == 'RUB2':
+        base = 'RUB'
         bot.send_message(call.message.chat.id, 'введи количество')
 
 
-# @bot.message_handler(content_types=['text', ])
-# def conv(message):
-#     global base
-#     global quote
-#
-#     amount = message.text
-#     total_base = Converter.converter(quote, base, amount)
-#     text = f"цена {amount} {quote} в {base} - {total_base}"
-#     bot.send_message(message.chat.id, text)
+@bot.message_handler(content_types=['text', ])
+def conv(message):
+    global base
+    global quote
+
+    amount = message.text
+
+    try:
+        total_base = Converter.converter(quote, base, amount)
+        text = f"цена {amount} {quote} в {base} - {total_base}"
+        bot.send_message(message.chat.id, text)
+    except ConvertExeption:
+        bot.send_message(message.chat.id, 'Введено не число')
 
 
 if __name__ == '__main__':
