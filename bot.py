@@ -3,7 +3,7 @@ from telebot import types
 
 from config import keys, TOKEN
 
-from utils import Converter, ConvertExeption
+from utils import Converter, ConvertExeption, Line_of_buttons
 
 bot = telebot.TeleBot(TOKEN)
 
@@ -16,13 +16,9 @@ base = ""
 def handle_start_help(message):
     msg = "Выбери название валюты, которую хочешь узнать:"
 
-    markup = types.InlineKeyboardMarkup(row_width=1)
-    item1 = types.InlineKeyboardButton("USD", callback_data='USD')
-    item2 = types.InlineKeyboardButton("EUR", callback_data='EUR')
-    item3 = types.InlineKeyboardButton("RUB", callback_data='RUB')
-    markup.add(item1, item2, item3)
+    buttons1 = Line_of_buttons(keys, number_line_of_buttons=1)
 
-    bot.send_message(message.chat.id, f"Привет , {message.chat.username}!\n{msg}", reply_markup=markup)
+    bot.send_message(message.chat.id, f"Привет , {message.chat.username}!\n{msg}", reply_markup=buttons1.get_markup())
 
 
 @bot.callback_query_handler(func=lambda call: True)
@@ -71,15 +67,15 @@ def callback(call):
         bot.send_message(call.message.chat.id, 'введи количество')
 
 
-@bot.message_handler(content_types=['text', ])
-def conv(message):
-    global base
-    global quote
-
-    amount = message.text
-    total_base = Converter.converter(quote, base, amount)
-    text = f"цена {amount} {quote} в {base} - {total_base}"
-    bot.send_message(message.chat.id, text)
+# @bot.message_handler(content_types=['text', ])
+# def conv(message):
+#     global base
+#     global quote
+#
+#     amount = message.text
+#     total_base = Converter.converter(quote, base, amount)
+#     text = f"цена {amount} {quote} в {base} - {total_base}"
+#     bot.send_message(message.chat.id, text)
 
 
 if __name__ == '__main__':
